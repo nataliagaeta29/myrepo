@@ -1,0 +1,97 @@
+---
+title: "M.ovipneumoniae (filtring, trimming and assembly)"
+author: "Natália Gaeta"
+date: "27/06/2022"
+output: html_document
+---
+
+# Sequencing method: Illumina MiSeq ( 2x 150 bp)
+
+
+# FIRST LOOK AT THE FILES
+
+
+# Counting the number of reads
+
+$grep -c "@VH00487" RJ3A7_S8_R1_001.fastq 
+$grep -c "@VH00487" RJ3A7_S8_R2_001.fastq 
+
+
+# Counting the number of sequenced nucleotides
+
+$grep -v "[^ACTGN]" RJ3A7_S8_R1_001.fastq | grep -o "."| wc -l $grep -v "[^ACTGN]" RJ3A7_S8_R2_001.fastq | grep -o "."| wc -l
+
+
+# Quality report I
+ # fastqc v0.11.9
+ 
+$fastqc -t 10 RJ3A7_S8_R1_001.fastq RJ3A7_S8_R2_001.fastq 
+$fastqc -t 10 RJ3A7_S8_R2_001.fastq RJ3A7_S8_R2_001.fastq 
+
+
+# FILTERING AND TRIMMING
+ 
+
+# Removing adaptors
+ # trimgalore v0.6.6
+ 
+$trim_galore --paired -o trim_galore reads/RJ3A7_S8_R1_001.fastq reads/RJ3A7_S8_R2_001.fastq      
+
+
+# Filtering and trimming (first cycle)
+ # afterqc v0.9.7
+
+$after.py -1 trim_galore/RJ3A7_S8_R1_001_val_1.fq -2 trim_galore/RJ3A7_S8_R2_001_val_2.fq -q 20 -g afterqc -b afterqc -r afterqc 
+
+
+# Filtering and trimming (second cycle)
+ # trimmomatic v0.39
+
+$trimmomatic PE afterqc/RJ3A7_S8_R1_001_val_1.good.fq afterqc/RJ3A7_S8_R2_001_val_2.good.fq -baseout trimmomatic/trimmed.fq LEADING:20 TRAILING:20 SLIDINGWINDOW:4:20 HEADCROP:10 CROP:135 MINLEN:15 
+
+
+# Quality report II
+  # fastqc v0.11.9
+ 
+$fastqc -t 10 trimmomatic/trimmed_1P.fq
+$fastqc -t 10 trimmomatic/trimmed_2P.fq
+
+
+# ESTIMATING THE GENOME SIZE
+ 
+ 
+$mkdir jellyfish
+
+
+# Defining and ensuring that k-mer size and file size will need memory compatible with the hardware you are using
+ # jellyfish v2.3.0
+ 
+$jellyfish mem -m 21 -s 250M
+997070840 (950M)
+
+
+# Estimating the genome size
+
+$jellyfish count -m 21 -s 250M -C trimmomatic/trimmed_*P.fq -o reads.jf
+$jellyfish histo jellyfish/reads.jf -o jellyfish/reads.histo
+
+
+# Access the "Genome Scope" tool website, and analize the jellyfish histogram output
+ # (http://qb.cshl.edu/genomescope/)
+ 
+ # Estimated genome size (bp): 1,043,176
+ 
+ 
+# GENOME ASSEMBLY
+ # SPAdes v.3.14.1
+ 
+$ spades.py --careful -t 10 -k 25,35,45,55,65,75,85,95,105 -1 trimmomatic/trimmed_1P -2 trimmomatic/trimmed_2P -o spades 
+
+
+# Verifying the assembly quality
+ # Quast 5.2.0
+ 
+$ quast -o results_quast trimmomatic/*.fasta 
+
+------------------------------------------------------------ //----------------------------------------------------------
+
