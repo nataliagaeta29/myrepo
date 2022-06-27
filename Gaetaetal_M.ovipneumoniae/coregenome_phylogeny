@@ -1,0 +1,79 @@
+---
+title: "M.ovipneumoniae (filtring, trimming and assembly)"
+author: "Natália Gaeta"
+date: "27/06/2022"
+output: html_document
+---
+
+# Sequencing method: Illumina MiSeq (2x 150 bp)
+
+
+# COREGENOME PHYLOGENY
+
+
+# Selecting M. ovipneumoniae genomes from GenBank 
+
+Mesomycoplasma ovipneumoniae strain TC1 (NZ_KV765896.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC4 (NZ_JOTH01000001.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC7 (NZ_KV766040.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC5 (NZ_KV766013.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC3 (NZ_KV765971.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC8 (NZ_KV765983.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC2 (NZ_JOTF01000001.1) - China, goat
+Mesomycoplasma ovipneumoniae SC01 (NZ_AFHO01000037) - China, goat
+Mycoplasma ovipneumoniae ATCC 29419 (NZ_AGRE01000010.1) - China, type strain, sheep
+Mycoplasma ovipneumoniae Y98 (NZ_KV765937) - Australia, Culture collection, sheep
+Mycoplasma ovipneumoniae NM2010 (NZ_JAKV01000001.1) - China, sheep
+Mesomycoplasma ovipneumoniae 90 (NZ_VZDP01000002) - New Zealand, sheep
+Mycoplasma ovipneumoniae 14811 (NZ_JFAD01000001) - France, sheep
+Mesomycoplasma hyopneumoniae strain NCTC10127(NZ_LR214992.1)   
+
+
+# Getting GGF files 
+ # prokka v1.14.6
+
+ # building a script = script.prokka.bash
+---------------------------------------------------------------------------------------------------------------------
+                                                                                                                    -
+#!/bin/bash                                                                                                         -
+                                                                                                                    -
+genomes=(Mhyopneumoniae strain14811 strain90 strainNM2010 strainSC01 strainTC1 strainTC2 strainTC3 strainTC4 /      -
+        strainTC5 strainTC7 strainTC8 ATCC29419 strainY98 strain_USP)                                               -
+                                                                                                                    -
+for i in ${!genomes[@]};                                                                                            -
+    do                                                                                                              -
+      echo "Analysing the genome ${genomes[i]}"                                                                     -
+      prokka --compliant --addgenes --locustag "${genomas[i]}" --genus 'Mycoplasma' --kingdom 'Bacteria' -gcode 4 / -
+    --evalue '1e-10' --cpus 10 --cdsrnaolap --outdir prokka --force --prefix ${genomes[i]} fna/${genomas[i]}.fna    -
+    done                                                                                                            -
+                                                                                                                    -
+echo "Gene prediction finished!"                                                                                    -
+                                                                                                                    -
+---------------------------------------------------------------------------------------------------------------------
+
+$bash script.prokka.bash
+
+
+
+# Building core-genome alignment
+ Roary v3.13.0
+ 
+$roary -e --mafft -cd 100 -t 4 -f roary prokka/*gff
+
+
+
+# Alignment evaluation
+ #Trimal v.1.4.1
+
+$trimal -nogaps -in core_gene_alignment.aln -out aln.trim.fasta -htmlout nogaps.html
+$trimal -automated1 -in core_gene_alignment.aln -fasta -out aln.auto.fasta -htmlout automated.html 
+
+
+
+# Phylogeny
+ # MEGA11
+ 
+- Neighboor Joining - Jukes-Cantor - 1000 bootstraps.
+
+
+------------------------------------------------------------ //----------------------------------------------------------
