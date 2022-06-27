@@ -1,0 +1,41 @@
+---
+title: "M.ovipneumoniae (filtring, trimming and assembly)"
+author: "Natália Gaeta"
+date: "27/06/2022"
+output: html_document
+---
+
+# Sequencing method: Illumina MiSeq (2x 150 bp)
+
+
+# GENOME ANALYSES
+
+
+# Annotation
+ # prokka v1.14.6
+ # gcode 4 for micoplasmas
+ 
+$ prokka --addgenes --locustag 'Mo' --centre 'ID' --compliant --genus 'Mycoplasma' --species 'ovipneumoniae'
+--kingdom 'Bacteria' --gcode '4' --evalue '1e-10' --cpus 5 --outdir annotation cd annotation spades/contigs.fasta
+
+
+
+# Analysis of completeness
+ # busco v5.2.2
+ 
+$weget https://busco-data.ezlab.org/v5/data/lineages/mycoplasmatales_odb10.2020-03-06.tar.gz  
+$busco -m genome -i ../spades/contigs.fasta -l mycoplasmatales_odb10/ -o busco.genome
+ 
+ 
+ 
+# Searching antimicrobial resistance genes
+ # Abricate v1.0.0
+ 
+ $abricate -db resfinder spades/contigs.fasta > resfinder_RJ3A5.txt
+ $abricate -db megares spades/contigs.fasta > megares_RJ3A5.txt
+ $abricate -db bacmet spades/contigs.fasta > bacmet_RJ3A5.txt
+ $abricate -db argannot spades/contigs.fasta > argannot_RJ3A5.txt
+ $abricate -db card spades/contigs.fasta > card_RJ3A5.txt
+ 
+ 
+------------------------------------------------------------ //----------------------------------------------------------
