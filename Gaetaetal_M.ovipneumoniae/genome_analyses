@@ -3,6 +3,9 @@ title: "M.ovipneumoniae (genome_analyses)"
 author: "Natália Gaeta"
 date: "27/06/2022"
 output: html_document
+Publication: Gaeta NC, de Sá Guimarães AM, Timenetsky J, Clouser S, Gregory L, Ganda E. 
+The first Mycoplasma ovipneumoniae recovered from a sheep with respiratory disease in Brazil - draft genome and genomic analysis. 
+Vet Res Commun. 2022 Jul 8. doi: 10.1007/s11259-022-09972-x. Epub ahead of print. PMID: 35804255.
 ---
 
 # Sequencing method: Illumina MiSeq (2x 150 bp)
