@@ -1,0 +1,32 @@
+Title: "S. epidermidis in guinea pig (Genome analyses)
+Author: "Natália Gaeta"
+Date: "08/02/2022"
+---
+
+#Detecting the 16SrRNA - species confirmation
+ #barrnap v.0.9
+
+$barrnap --quiet /mnt/d/Pesquisas_sequenciamento/epidermidis/spades/contigs.fasta -o 16S/rrna.fna
+
+
+
+#ANTIMICROBIAL RESISTANCE GENES
+ #abricate v1.0.1
+
+$abricate -db megares spades/contigs.fasta > abricate/megares.txt
+$abricate -db card spades/contigs.fasta > abricate/CARD.txt
+$abricate -db resfinder spades/contigs.fasta > abricate/resfinder.txt
+
+
+#VIRULENCE GENES
+ #abricate v1.0.1
+
+$abricate -db vfdb spades/contigs.fasta > abricate/vfdb.txt
+
+
+
+#ANNOTATION 
+ #prokka v1.14.6
+
+ $ prokka --addgenes --locustag 'Se' --centre 'ID' --compliant --genus 'Staphylococcus' --species 'epidermidis' --kingdom 'Bacteria' --gcode '11' --evalue '1e-10' --cpus 5 --outdir annotation spades/contigs.fasta 
+
