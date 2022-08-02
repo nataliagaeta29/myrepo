@@ -1,0 +1,99 @@
+Title: "S. epidermidis in guinea pig (filtering, trimming and assembly)
+Author: "Natália Gaeta"
+Date: "08/02/2022"
+
+
+# Sequencing method: Illumina Miseq (2x 150 bp)
+
+
+1) FIRST LOOK AT THE FILES
+
+
+# Counting the number of reads
+
+grep -c "@M07332" Staph-MB_S1_L001_R1_001.fastq  
+grep -c "@M07332" Staph-MB_S1_L001_R1_001.fastq 
+
+
+
+# Counting the number of sequenced nucleotides
+ 
+grep -v "[^ACTGN]" Staph-MB_S1_L001_R1_001.fastq | grep -o "."| wc -l = 318,315,382 nucleotídeos
+grep -v "[^ACTGN]" Staph-MB_S1_L001_R2_001.fastq | grep -o "."| wc -l = 318,321,246 nucleotídeos
+
+
+
+# Quality report I
+ #fastqc v.0.11.9
+
+fastqc -t 5 Staph-MB_S1_L001_R1_001.fastq Staph-MB_S1_L001_R2_001.fastq 
+
+
+
+#FILTERING AND TRIMMING
+
+
+a. Removing adaptors
+ #trimgalore v.0.6.6
+
+$ trim_galore --paired -o trimgalore Staph-MB_S1_L001_R1_001.fastq Staph-MB_S1_L001_R2_001.fastq /
+1>saida.trimgalore.1.txt 2>saida.trimgalore.2.txt 
+
+
+b. Filtering and trimming (first cycle)
+ #afterqc v.0.9.7
+
+$ after.py -1 Staph-MB_S1_L001_R1_001_val_1.fq -2 Staph-MB_S1_L001_R2_001_val_2.fq -q 20 -g afterqc -b afterqc -r afterqc  
+
+
+c. Filtering and trimming (second cycle)
+ #trimmomatic v.0.39
+
+$ trimmomatic PE afterqc/Staph-MB_S1_L001_R1_001_val_1.good.fq afterqc/Staph-MB_S1_L001_R2_001_val_2.good.fq -baseout trimmomatic/trimmed.fq LEADING:20 TRAILING:20 SLIDINGWINDOW:4:20 HEADCROP:25 CROP:150 MINLEN:50 \
+
+
+#Quality report II
+ #fastqc v.0.11.9
+
+$ fastqc -t 10 trimmomatic/trimmed_1P.fq
+$ fastqc -t 10 trimmomatic/trimmed_2P.fq
+
+
+
+# ESTIMATING THE GENOME SIZE
+
+
+
+# Defining and ensuring that k-mer size and file size will need memory compatible with the hardware you are using
+ # jellyfish v2.3.0
+ 
+$jellyfish mem -m 21 -s 250M
+997070840 (950M)
+
+
+
+# ESTIMATING THE GENOME SIZE
+
+$ jellyfish count -m 21 -s 250M -C trimmomatic/*P.fq -o jellyfish/reads.jf
+$ jellyfish histo jellyfish/reads.jf -o jellyfish/reads.histo
+
+
+# Access the "Genome Scope" tool website, and analyze the jellyfish histogram output
+ # (http://qb.cshl.edu/genomescope/)
+
+# Estimated genome size (bp): 2,605,0843 
+
+
+
+# GENOME ASSEMBLY
+ #SPAdes v.3.14.1
+
+$spades.py --careful -t 10 -k 25,35,45,55,65,75,85,95 -1 trimmomatic/trimmed_1P -2 trimmomatic/trimmed_2P -o spades 
+
+
+# Verifying the assembly quality
+ # Quast 5.2.0
+
+$ quast -o results_quast spades/contigs.fasta 
+
+-----------------------------------------------------------------//---------------------------------------------------------------------------------------------------
