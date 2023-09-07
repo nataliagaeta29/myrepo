@@ -1,0 +1,192 @@
+title: "M.ovipneumoniae (Core Genome analysis)"
+author: "Natália Gaeta"
+date: "07/09/2023"
+"Comparative genomic analysis of Brazilian Mesomycoplasma ovipneumoniae strains revealed genomic differences associated with the geographic origin and health status and mutations in the gyrA"
+
+#Illumina 2 X 150 bp
+
+
+# COREGENOME PHYLOGENY
+
+
+# Selecting M. ovipneumoniae genomes from GenBank 
+
+Mesomycoplasma ovipneumoniae strain TC1 (NZ_KV765896.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC4 (NZ_JOTH01000001.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC7 (NZ_KV766040.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC5 (NZ_KV766013.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC3 (NZ_KV765971.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC8 (NZ_KV765983.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC2 (NZ_JOTF01000001.1) - China, goat
+Mesomycoplasma ovipneumoniae SC01 (NZ_AFHO01000037) - China, goat
+Mycoplasma ovipneumoniae ATCC 29419 (NZ_AGRE01000010.1) - China, type strain, sheep
+Mycoplasma ovipneumoniae Y98 (NZ_KV765937) - Australia, Culture collection, sheep
+Mycoplasma ovipneumoniae NM2010 (NZ_JAKV01000001.1) - China, sheep
+Mesomycoplasma ovipneumoniae 90 (NZ_VZDP01000002) - New Zealand, sheep
+Mycoplasma ovipneumoniae 14811 (NZ_JFAD01000001) - France, sheep
+Mesomycoplasma hyopneumoniae strain NCTC10127(NZ_LR214992.1)   
+
+
+# Getting GGF files 
+ # prokka v1.14.6
+
+ # building a script = script.prokka.bash
+---------------------------------------------------------------------------------------------------------------------
+                                                                                                                    -
+#!/bin/bash                                                                                                         -
+                                                                                                                    -
+genomes=(Mhyopneumoniae strain14811 strain90 strainNM2010 strainSC01 strainTC1 strainTC2 strainTC3 strainTC4 /      -
+        strainTC5 strainTC7 strainTC8 ATCC29419 strainY98 strain_USP)                                               -
+                                                                                                                    -
+for i in ${!genomes[@]};                                                                                            -
+    do                                                                                                              -
+      echo "Analysing the genome ${genomes[i]}"                                                                     -
+      prokka --compliant --addgenes --locustag "${genomas[i]}" --genus 'Mycoplasma' --kingdom 'Bacteria' -gcode 4 / -
+    --evalue '1e-10' --cpus 10 --cdsrnaolap --outdir prokka --force --prefix ${genomes[i]} fna/${genomas[i]}.fna    -
+    done                                                                                                            -
+                                                                                                                    -
+echo "Gene prediction finished!"                                                                                    -
+                                                                                                                    -
+---------------------------------------------------------------------------------------------------------------------
+
+$bash script.prokka.bash
+
+
+
+# Building core-genome alignment
+ Roary v3.13.0
+ 
+$roary -e --mafft -cd 100 -t 4 -f roary prokka/*gff
+
+
+
+# Alignment evaluation
+ #Trimal v.1.4.1
+
+$trimal -nogaps -in core_gene_alignment.aln -out aln.trim.fasta -htmlout nogaps.html
+$trimal -automated1 -in core_gene_alignment.aln -fasta -out aln.auto.fasta -htmlout automated.html 
+
+
+
+# Phylogeny
+ # MEGA11
+ 
+- Neighboor Joining - Jukes-Cantor - 1000 bootstraps.
+
+-----------------------------------------------------------------------------------------
+
+2)COREGENOME PHYLOGENY
+
+
+#Selecting M. ovipneumoniae genomes from GenBank 
+
+Mesomycoplasma ovipneumoniae USP-BR2017(GCA_023845075.1) - Brazil, sheep
+Mesomycoplasma ovipneumoniae USP-SP358 - Brazil, sheep
+Mesomycoplasma ovipneumoniae USP-SP475 - Brazil, sheep
+Mesomycoplasma ovipneumoniae USP-SP749 - Brazil, sheep
+Mesomycoplasma ovipneumoniae USP-SP750 - Brazil, sheep
+Mesomycoplasma ovipneumoniae USP-SP3A1 - Brazil, sheep
+Mesomycoplasma ovipneumoniae USP-SP1A3 - Brazil, sheep
+Mesomycoplasma ovipneumoniae USP-SP2A14 - Brazil, sheep
+Mesomycoplasma ovipneumoniae USP-SP3A2  - Brazil, sheep
+Mesomycoplasma ovipneumoniae USP-SP6A6 - Brazil, sheep
+Mycoplasma ovipneumoniae ATCC 29419 (NZ_AGRE01000010.1) - China, type strain, sheep
+Mycoplasma ovipneumoniae Y98 (NZ_KV765937) - Australia, Culture collection, sheep
+Mycoplasma ovipneumoniae NM2010 (NZ_JAKV01000001.1) - China, sheep
+Mesomycoplasma ovipneumoniae 90 (NZ_VZDP01000002) - New Zealand, sheep
+Mycoplasma ovipneumoniae 14811 (NZ_JFAD01000001) - France, sheep
+Mesomycoplasma ovipneumoniae strain 150 (CP079200.1) - Bosnia and Herzegovina, sheep
+
+Mesomycoplasma ovipneumoniae IK3 (GCA_024328295.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC1 (NZ_KV765896.1) - China, goat
+Mesomycoplasma ovipneumoniae strain TC2 (NZ_JOTF01000001.1) - China, goat
+Mesomycoplasma ovipneumoniae SC01 (NZ_AFHO01000037) - China, goat
+Mesomycoplasma ovipneumoniae 274 (NZ_CP079199.1) - Bosnia and Herzegovina, goat
+Mesomycoplasma ovipneumoniae strain NXNK2203 (NZ_CP124621.1) - China, sheep  
+Mesomycoplasma hyopneumoniae strain NCTC10127(NZ_LR214992.1)
+
+
+# Getting GGF files 
+ # prokka v1.14.6
+
+ # building a script = script.prokka.bash
+---------------------------------------------------------------------------------------------------------------------
+                                                                                                                    -
+#!/bin/bash                                                                                                         -
+                                                                                                                    -
+genomes=(Mhyopneumoniae strain14811 strain90 strainNM2010 strainSC01 strainTC1 strainTC2  /                         -
+        SP358 SP475 SP749 SP750 RJ1A3 RJ3A2 RJ6AA ATCC29419 strainY98 strain_USP)                                   -
+                                                                                                                    -
+for i in ${!genomes[@]};                                                                                            -
+    do                                                                                                              -
+      echo "Analysing the genome ${genomes[i]}"                                                                     -
+      prokka --compliant --addgenes --locustag "${genomas[i]}" --genus 'Mycoplasma' --kingdom 'Bacteria' -gcode 4 / -
+    --evalue '1e-10' --cpus 10 --cdsrnaolap --outdir prokka --force --prefix ${genomes[i]} fna/${genomas[i]}.fna    -
+    done                                                                                                            -
+                                                                                                                    -
+echo "Gene prediction finished!"                                                                                    -
+                                                                                                                    -
+---------------------------------------------------------------------------------------------------------------------
+
+$bash script.prokka.bash
+
+
+
+# Building core-genome alignment
+ Roary v3.13.0
+ env: gene
+ 
+$roary -e --mafft -cd 100 -t 4 -p 8 -f roary fasta/prokka/*.gff
+
+
+
+# Alignment evaluation
+ #Trimal v.1.4.1
+
+$trimal -nogaps -in core_gene_alignment.aln -out aln.trim.fasta -htmlout nogaps.html
+$trimal -automated1 -in core_gene_alignment.aln -fasta -out aln.auto.fasta -htmlout automated.html 
+
+ - os dois tiveram o mesmo resultado. Escolhendo o trimmado.
+
+# Phylogeny
+ # MEGA11
+ 
+- Neighboor Joining - Jukes-Cantor - 1000 bootstraps. (Ficou show de bola)
+
+ ------------------------------------------------------------------------------------------------
+ 
+# heatmap para ANI de todos contra todos
+
+fastAni v.
+env: gene
+
+Many to Many. When there are multiple query genomes and multiple reference genomes:
+./fastANI --ql [QUERY_LIST] --rl [REFERENCE_LIST] -o [OUTPUT_FILE]
+Again, QUERY_LIST and REFERENCE_LIST are files containing paths to genomes, one per line.
+
+
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/ATCC29419.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/RJ1A3.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/RJ2A14.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/RJ3A2.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/RJ3A7.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/SP749.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/strain90.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/strainSC01.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/RJ6A6.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/SP750.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/strainTC1.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/SP358.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/strain14811.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/strainIK3.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/strainTC2.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/SP3A1.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/strain150.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/strainNM2010.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/strainY98.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/SP475.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/strainNXNK2203.fna
+/mnt/d/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/filogenia_final/strain274.fna                      
+ 
+----------------------------------------------------------------------------------------------
+
