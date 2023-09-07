@@ -1,0 +1,81 @@
+title: "M.ovipneumoniae (RStudio)"
+author: "Natália Gaeta"
+date: "07/09/2023"
+"Comparative genomic analysis of Brazilian Mesomycoplasma ovipneumoniae strains revealed genomic differences
+associated with the geographic origin and health status and mutations in the gyrA"
+
+
+# RStudio codes
+
+1. Heatmap Pfam families
+
+library(ggplot2)
+library(readxl)
+
+setwd('D:/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/pfam/')
+
+familia <- read.csv('pfam.csv', header = T, sep = ';', nrows = 2071)
+
+
+familia$Isolate = reorder(familia$Isolate, familia$Order)
+familia$Family = reorder(familia$Family, familia$Order2)
+
+
+ggplot(familia, aes(x=Family, y=Isolate, fill=Occurence3))+
+  geom_tile() + 
+  scale_color_binned(low = 'black', high = 'blue')+
+  geom_vline(xintercept=seq(1.5, length(familia$Occurence3))) + 
+  geom_hline(yintercept=seq(1.5, length(familia$Occurence3))) +  
+  theme(
+    axis.line = element_blank(),
+    axis.ticks = element_blank(),
+    panel.background = element_blank(),
+    axis.title.x = element_text(angle=360, size=12, hjust=0.5, face = 'bold'),
+    axis.title.y = element_text(angle=90, size=12, hjust=0.5, vjust = 0.5, face = 'bold'),
+    axis.text.x = element_text(angle=90, size=12, hjust=0.8, face = 'bold'),
+    axis.text.y = element_text(face = 'italic', hjust = 0, size = 12, color = 'black'),
+    legend.title = element_text(face ='bold'),
+    legend.text = element_text(size = 12))
+
+
+ggsave(filename = 'pfam.tiff', device = "tiff" , height = 6, width = 30, dpi = 400, path = './')
+
+----------------------------------------------------//-------------------------------------------
+
+
+2. Barplot KEGG Subsystems 
+
+setwd('D:/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/subsystems_BVbRC/')
+
+barplot_sub <- read.csv('barplot.csv', sep = ';', header = T)
+barplot_sub
+
+library(ggplot2)
+
+
+#barplot
+# Use position=position_dodge()
+ggplot(data=barplot_sub, aes(x=Subsystems.Category, y=Number.of.genes, fill=Feature)) +
+  geom_bar(stat="identity", color="black", position=position_dodge()) + theme_bw() +
+  coord_flip() + theme(axis.text.x = element_text(angle = 45, vjust = 0.6, hjust=0.7, size = 12),
+            axis.text.y = element_text(size = 12), axis.title = element_text(size = 14, face = 'bold'),
+            legend.title = element_text(size = 14, face = 'bold'), legend.text = element_text(
+              size = 12)) +
+          scale_fill_manual(values = c("#FF3399", "#0066CC", "#33CCCC", "#FFFF33"))
+
+
+----------------------------------------------------//-------------------------------------------
+
+3. virulence gene comparison by geographic location and health status
+
+
+setwd('D:/Pesquisas_sequenciamento/mycoplasma/paper_geral/Analysis/virulencia_resistencia/')
+
+virulencia <- read.csv('glpf_id.csv', sep = ';', header = T)
+virulencia
+
+library(psych)
+
+kruskal.test(virulencia$identity ~ virulencia$health)
+kruskal.test(virulencia$identity ~ virulencia$local)
+
